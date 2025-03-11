@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import { FaFacebookSquare, FaShoppingCart, FaTwitterSquare, FaUser } from "react-icons/fa";
