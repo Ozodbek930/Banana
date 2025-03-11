@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 import "rodal/lib/rodal.css";
 import { FaFacebookSquare } from "react-icons/fa";
 import { CiInstagram } from "react-icons/ci";
@@ -13,14 +12,11 @@ import Home from "./home/page";
 import Sliders from "./Sliders/page";
 
 export default function GreenShop() {
-  // Faqat o'qish uchun kerak bo'lgan state; setter ishlatilmayotganligi uchun uni chiqarib tashladik.
   const [cartItems] = useState(0);
   const router = useRouter();
   const [price, setPrice] = useState([39, 1230]);
 
-  // Foydalanilmayotgan: categories, loading, modalVisible, selectedProduct, quantity 
-  // Agar kelajakda kerak bo'lsa, keyinchalik qo'shilishi mumkin.
-  
+
   const handleChange = (index: number, value: number) => {
     const newPrice = [...price];
     newPrice[index] = value;
