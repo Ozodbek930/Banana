@@ -52,8 +52,6 @@ export default function ProductDetails() {
         images: imagesArray,
       });
       setSelectedImage(imagesArray[0] || "");
-    } catch (error: any) {
-      console.error("Error fetching product:", error.message);
     } finally {
       setLoading(false);
     }
