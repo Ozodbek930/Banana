@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; 
-import { supabase } from "@/supabaseClient"; 
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { createClient } from "@/supabase/client";
+import Image from "next/image";
 
 type ColumnId = "new" | "inProgress" | "completed";
 
@@ -21,9 +21,8 @@ interface OrderType {
 export default function OrdersPage() {
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [passwordInput, setPasswordInput] = useState<string>("");
-
   const [loading, setLoading] = useState<boolean>(true);
-  const supabase =  createClient()
+  const supabase = createClient();
   const [orders, setOrders] = useState<{ [key in ColumnId]: OrderType[] }>({
     new: [],
     inProgress: [],
@@ -31,13 +30,7 @@ export default function OrdersPage() {
   });
   const router = useRouter();
 
-  useEffect(() => {
-    if (authenticated) {
-      fetchOrders();
-    }
-  }, [authenticated]);
-
-  const fetchOrders = async (): Promise<void> => {
+  const fetchOrders = useCallback(async (): Promise<void> => {
     setLoading(true);
     const { data, error } = await supabase
       .from("Orders")
@@ -51,7 +44,7 @@ export default function OrdersPage() {
         inProgress: [],
         completed: [],
       };
-      data.forEach((order: any) => {
+      data.forEach((order) => {
         if (!order.status) {
           groupedOrders.new.push({ ...order, status: "new" });
         } else if (order.status === "inProgress") {
@@ -65,7 +58,13 @@ export default function OrdersPage() {
       setOrders(groupedOrders);
     }
     setLoading(false);
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchOrders();
+    }
+  }, [authenticated, fetchOrders]);
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -120,16 +119,20 @@ export default function OrdersPage() {
     if (passwordInput === "OzodbekTOP") {
       setAuthenticated(true);
     } else {
-      alert("Parol noto'g'ri!");
+      alert("Parol noto\u0027g\u0027ri!");
     }
   };
-
 
   if (!authenticated) {
     return (
       <div className="container py-4">
-        <h2 className="text-center mb-4">Orders sahifasiga kirish uchun parolni kiriting</h2>
-        <form onSubmit={handlePasswordSubmit} className="d-flex flex-column align-items-center">
+        <h2 className="text-center mb-4">
+          Orders sahifasiga kirish uchun parolni kiriting
+        </h2>
+        <form
+          onSubmit={handlePasswordSubmit}
+          className="d-flex flex-column align-items-center"
+        >
           <input
             type="password"
             value={passwordInput}
@@ -149,10 +152,16 @@ export default function OrdersPage() {
     <div className="d-flex">
       <div className="container py-4">
         <nav className="bg-white shadow p-4 d-flex justify-content-between align-items-center">
-          <h1 onClick={() => router.push("/admin")} className="text-green-600 text-2xl font-bold">
+          <h1
+            onClick={() => router.push("/admin")}
+            className="text-green-600 text-2xl font-bold"
+          >
             GREENSHOP
           </h1>
-          <button className="btn btn-primary" onClick={() => router.push("/")}>
+          <button
+            className="btn btn-primary"
+            onClick={() => router.push("/")}
+          >
             Bosh sahifaga o'tish
           </button>
           <div className="d-flex gap-3 align-items-center">
@@ -197,22 +206,27 @@ export default function OrdersPage() {
                       draggable
                       onDragStart={(e) => handleDragStart(e, order, columnId)}
                     >
-                      <h5 className="text-primary">{order.product_name}</h5>
+                      <h5 className="text-primary">
+                        {order.product_name}
+                      </h5>
                       <p>{order.description}</p>
                       <p className="fw-bold">Narx: ${order.price}</p>
                       <p>Soni: {order.quantity}</p>
                       <p className="text-muted">
-                        Sana: {new Date(order.created_at).toLocaleString()}
+                        Sana:{" "}
+                        {new Date(order.created_at).toLocaleString()}
                       </p>
                       <p className="fw-bold text-success">
                         Jami: ${order.price * order.quantity}
                       </p>
                       {order.Img && (
-                        <img
+                        <Image
                           src={order.Img}
                           alt={order.product_name}
                           className="img-fluid mt-2 rounded shadow-sm"
                           style={{ maxWidth: "100%", maxHeight: "180px" }}
+                          width={300}
+                          height={180}
                         />
                       )}
                     </div>
